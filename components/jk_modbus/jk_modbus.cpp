@@ -26,15 +26,19 @@ void JkModbus::loop() {
     this->last_jk_modbus_byte_ = now;
   }
 
-  while (this->available()) {
-    uint8_t byte;
-    this->read_byte(&byte);
-    if (this->parse_jk_modbus_byte_(byte)) {
-      this->last_jk_modbus_byte_ = now;
-    } else {
-      ESP_LOGVV(TAG, "Buffer cleared due to reset: %s",
-                format_hex_pretty(&this->rx_buffer_.front(), this->rx_buffer_.size()).c_str());
-      this->rx_buffer_.clear();
+  std::vector<uint8_t> buffer(128);
+  size_t to_read = 0;
+  while (to_read = this->available()) {
+    // uint8_t byte;
+    this->read_array(&buffer[0], to_read);
+    for (size_t i = 0; i < to_read; i++) {
+      if (this->parse_jk_modbus_byte_(buffer[i])) {
+        this->last_jk_modbus_byte_ = now;
+      } else {
+        ESP_LOGVV(TAG, "Buffer cleared due to reset: %s",
+                  format_hex_pretty(&this->rx_buffer_.front(), this->rx_buffer_.size()).c_str());
+        this->rx_buffer_.clear();
+      }
     }
   }
 }
