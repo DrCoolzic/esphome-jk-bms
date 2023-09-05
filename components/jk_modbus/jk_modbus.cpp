@@ -144,8 +144,8 @@ void JkModbus::send(uint8_t function, uint8_t address, uint8_t value) {
   frame[20] = crc >> 8;
   frame[21] = crc >> 0;
 
-  this->write_array(frame, 22);
   this->flush();
+  this->write_array(frame, 22);
 }
 
 void JkModbus::authenticate_() { this->send(FUNCTION_PASSWORD, 0x00, 0x00); }
@@ -182,8 +182,8 @@ void JkModbus::read_registers() {
   frame[19] = crc >> 8;
   frame[20] = crc >> 0;
 
-  this->write_array(frame, 21);
   this->flush();
+  this->write_array(frame, 21);
 }
 
 }  // namespace jk_modbus
