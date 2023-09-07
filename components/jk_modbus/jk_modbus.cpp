@@ -26,7 +26,6 @@ auto elapsed = [](uint32_t &t) {
   return e;
 };
 
-elapsed(read_loop);
 void JkModbus::loop() {
   const uint32_t now = millis();
   if (now - this->last_jk_modbus_byte_ > this->rx_timeout_) {
