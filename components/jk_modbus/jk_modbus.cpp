@@ -21,8 +21,8 @@ uint32_t write_loop;
 uint32_t read_loop;
 uint32_t time;
 auto elapsed = [](uint32_t &t) {
-  auto e = millis() - t;
-  t = millis();
+  auto e = micros() - t;
+  t = micros();
   return e;
 };
 
@@ -39,7 +39,7 @@ void JkModbus::loop() {
   while (this->available()) {
     uint8_t byte;
     this->read_byte(&byte);
-    ESP_LOGI(TAG, "TIME: av+rd=%d=d ms rd_loop=%d ms", elapsed(time), elapsed(read_loop));
+    ESP_LOGI(TAG, "TIME: av+rd=%d µs rd_loop=%d µs", elapsed(time), elapsed(read_loop));
     if (this->parse_jk_modbus_byte_(byte)) {
       this->last_jk_modbus_byte_ = now;
     } else {
@@ -159,7 +159,7 @@ void JkModbus::send(uint8_t function, uint8_t address, uint8_t value) {
   elapsed(time);
   this->write_array(frame, 22);
   this->flush();
-  ESP_LOGI(TAG, "TIME: wr+fl=%s=d ms rd_loop=%d ms", elapsed(time), elapsed(write_loop));
+  ESP_LOGI(TAG, "TIME: wr+fl=%s=d µs rd_loop=%d µs", elapsed(time), elapsed(write_loop));
 }
 
 void JkModbus::authenticate_() { this->send(FUNCTION_PASSWORD, 0x00, 0x00); }
