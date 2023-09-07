@@ -17,6 +17,15 @@ static const uint8_t ADDRESS_READ_ALL = 0x00;
 
 static const uint8_t FRAME_SOURCE_GPS = 0x02;
 
+uint32_t write_loop;
+uint32_t read_loop;
+uint32_t time;
+auto elapsed = [](uint32_t &t) {
+  auto e = millis() - t;
+  t = millis();
+  return e;
+};
+
 void JkModbus::loop() {
   const uint32_t now = millis();
   if (now - this->last_jk_modbus_byte_ > this->rx_timeout_) {
@@ -26,9 +35,11 @@ void JkModbus::loop() {
     this->last_jk_modbus_byte_ = now;
   }
 
+  elapsed(time);
   while (this->available()) {
     uint8_t byte;
     this->read_byte(&byte);
+    ESP_LOGI(TAG, "TIME: av+rd=%s=d rd_loop=%d", elapsed(time), elapsed(read_loop));
     if (this->parse_jk_modbus_byte_(byte)) {
       this->last_jk_modbus_byte_ = now;
     } else {
@@ -36,6 +47,7 @@ void JkModbus::loop() {
                 format_hex_pretty(&this->rx_buffer_.front(), this->rx_buffer_.size()).c_str());
       this->rx_buffer_.clear();
     }
+    elapsed(time);
   }
 }
 
@@ -144,8 +156,10 @@ void JkModbus::send(uint8_t function, uint8_t address, uint8_t value) {
   frame[20] = crc >> 8;
   frame[21] = crc >> 0;
 
+  elapsed(time);
   this->write_array(frame, 22);
   this->flush();
+  ESP_LOGI(TAG, "TIME: av+rd=%s=d rd_loop=%d", elapsed(time), elapsed(write_loop));
 }
 
 void JkModbus::authenticate_() { this->send(FUNCTION_PASSWORD, 0x00, 0x00); }
