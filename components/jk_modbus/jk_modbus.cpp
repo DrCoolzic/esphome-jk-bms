@@ -39,7 +39,7 @@ void JkModbus::loop() {
   while (this->available()) {
     uint8_t byte;
     this->read_byte(&byte);
-    ESP_LOGI(TAG, "TIME: av+rd=%s=d ms rd_loop=%d ms", elapsed(time), elapsed(read_loop));
+    ESP_LOGI(TAG, "TIME: av+rd=%d=d ms rd_loop=%d ms", elapsed(time), elapsed(read_loop));
     if (this->parse_jk_modbus_byte_(byte)) {
       this->last_jk_modbus_byte_ = now;
     } else {
